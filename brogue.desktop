@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Brogue
+GenericName=Roguelike
+Comment=Brave the Dungeons of Doom!
+Comment[de]=Meistere die Dungeons der Verdammnis!
+Comment[ru]=Бросьте вызов Подземельям Погибели!
+Exec=/opt/BrogueCE-linux/brogue
+Path=/opt/BrogueCE-linux
+Icon=/opt/BrogueCE-linux/bin/assets/icon.png
+Terminal=false
+Categories=Game;

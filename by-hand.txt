@@ -1,0 +1,29 @@
+
+ Manual Labor
+
+1. Setup Redshift to reduce insomnia and eye-strain.
+   goto: http://latlong.net, find your lat:lon.
+   in terminal, run (replace {lat} & {lon}): 
+     $ redhift-gtk -l {lat}:{lon}&
+   Click on Redshift in panel, check 'Autostart' box.
+
+2. Get/Set Wallpaper
+   goto: https://unsplash.com/s/photos/wallpaper?orientation=landscape
+   download pictues to: ~/Pictures/wallpaper/ (create it the first time)
+   open Thunar/File Manager to ~/Pictures/wallpaper/
+   right-click an image, select 'Set as wallpaper'
+
+3. Setup LibreWolf
+
+   2a. default search engine
+       goto: https://search.brave.com/
+       right-click address bar, select 'Add "Brave Search"'
+       goto: about:preferences#search
+       select Brave as default engine & check to use in private
+       In the 'Find in Settings' search box, look up, 'DRM'
+       check Enable DRM play
+       In the 'Find in Settings' search box, look up, 'webgl'
+       check Enable WebGL
+
+   2b. import bookmarks
+       bookmarks can be found at: fmhy.net, zinclinux.tech.blog/bookmarks, or in optional FNX file in archive.zip

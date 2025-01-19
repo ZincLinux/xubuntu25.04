@@ -1,0 +1,101 @@
+#!/bin/python3
+import os
+import sys
+from PIL import Image #python3-pil
+
+def sift(ik):
+	c=[0]*256
+	for b in ik:c[int(b)]+=1
+	d=c.index(max(c));ok=bytearray()
+	for b in ik:
+		if int(b)!=d:ok.append(b)
+	return ok
+
+def sy4(imgNm,size=4096):
+	img=Image.open(imgNm,'r')
+	k=bytearray();w,h=img.size;px=img.load()
+	x=y=sz=l=l2=l3=0
+	for i in range(pxLen(img)):
+		pB=bytearray(px[x,y]);c=i%len(pB);p=pB.pop(c)>>2
+		for b in pB:
+			b=b>>2;lb=g2b(p);p=p>>2;b=(b*4)+lb
+			if b not in (l, l2, l3):
+				k.append(b);l3=l2;l2=l;l=b;sz+=1
+			else:k.reverse()
+			if sz>=size:return k
+		x+=1
+		if x>=w:x=0;y+=1
+		if y>=h:y=0
+	return k
+
+def xor(dFile,imgNm,sft=1):
+	iD=binFile(dFile);oD=bytearray();outNm=dFile+'.xor';key=sy4(imgNm)
+	for ss in range(sft):key=sift(key)
+	dLen=len(iD);t=i=0;kLen=len(key);print()
+	for dB in iD:
+		oD.append(dB^key[i]);i+=1;t+=1
+		if i>=kLen:i=0;prog(t/dLen*1.0)
+	with open(outNm,'wb') as out:
+		out.write(oD)
+	print("[√] → "+outNm)
+
+def prog(p,w=50):print('\033[1A',end='\x1b[2K');i=int(p*100)+1;f=int(w*p);e=w-f-1;print("▒"*f+"░"*e+' '+str(i)+'%')
+def pxByt(pixel):pB=bytearray(pixel);return g2b(pB[0])*64+g2b(pB[1])*16+g2b(pB[2])*4+g2b(pB[3])
+def binFile(fn):f=open(fn,"rb");d=f.read();f.close();return bytearray(d)
+def g2b(byte):return 0b00000011&byte
+def s2b(byte,val):return byte>>2<<2|val
+def asRGBA(f):return Image.open(f,'r').convert('RGBA')
+def pxLen(img):w,h=img.size;return w*h
+def fileSz(f):return os.path.getsize(f)
+def mkHdr(size):return (size*256+7).to_bytes(4,byteorder='big')
+def isZip(d):return bool(len(d)>3 and d[0:4]==b'PK\x03\x04')
+	
+def inject(inFile,imgNm):
+	img=asRGBA(imgNm)
+	if fileSz(inFile)>pxLen(img):print("[χ] File > Image");return
+	fDat=binFile(inFile)
+	if isZip(fDat):print("[√] = PKZIP")
+	else:
+		if len(fDat)>16777215:print("[χ] Plaintext > 16777215 bytes");return
+		else:fDat=bytearray(mkHdr(len(fDat)))+fDat
+	w=img.size[0];px=img.load();x=y=0
+	print();fdsz=len(fDat)
+	for i in range(fdsz):
+		dB=fDat[i];pB=bytearray(px[x,y])
+		a=s2b(pB[3],g2b(dB));dB=dB>>2
+		b=s2b(pB[2],g2b(dB));dB=dB>>2
+		g=s2b(pB[1],g2b(dB));dB=dB>>2
+		r=s2b(pB[0],g2b(dB))
+		img.putpixel((x,y),(r,g,b,a));x+=1
+		if x==w:x=0;y+=1;prog(i/fdsz*1.0)
+	outImg=imgNm+".new.png"
+	img.save(outImg);print("[√] → "+outImg)
+
+def extract(imgNm):
+	img=asRGBA(imgNm);xData=bytearray();w=img.size[0];px=img.load();x=y=ptSz=0
+	if pxByt(px[3,0])==7:ptSz=pxByt(px[0,0])*65536+pxByt(px[1,0])*256+pxByt(px[2,0])
+	if ptSz:pR=ptSz;ext='.txt';x=4
+	else:pR=pxLen(img);ext='.zip';print()
+	for i in range(pR):
+		xData.append(pxByt(px[x,y]));x+=1
+		if x==w:x=0;y+=1;prog(i/pR*1.0)
+	outFile=imgNm+ext
+	with open(outFile,"wb") as out:
+		out.write(xData)
+	print("[√] → "+outFile)
+
+if __name__ == '__main__':
+	try:
+		m=sys.argv[1].replace('-','')
+		img=sys.argv[2]
+		if m=='e':extract(img)
+		else:
+			fil=sys.argv[3]
+			if m=='i':inject(fil,img)
+			elif m=='x':xor(fil,img)
+			else: isZip()
+	except:
+		print('''Usage: -[e/i/x] image [file]\n
+Extract FILE from IMAGE:-e IMAGE.PNG			→IMAGE.zip/txt\n
+Inject FILE into IMAGE:	-i IMAGE.JPG FILE.ZIP/TXT	→IMAGE.JPG.new.png\n
+XOR FILE with IMAGE:	-x IMAGE.PNG FILE.EXT		→FILE.EXT.xor''')

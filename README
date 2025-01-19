@@ -1,0 +1,6 @@
+5-min vanilla Xubuntu 25.04:Minimal patch
+
+0. Install: Xubuntu 25.04, Minimal
+1. Edit & run: 'sudo ./installs.sh'
+2. View & run: 'sudo ./archives.sh'
+3. Follow steps in: 'by-hand.txt'
