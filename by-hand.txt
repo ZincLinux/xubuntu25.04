@@ -20,6 +20,8 @@
        right-click address bar, select 'Add "Brave Search"'
        goto: about:preferences#search
        select Brave as default engine & check to use in private
+
+   2b. enable canvas/DRM support (continued from prev. step)
        In the 'Find in Settings' search box, look up, 'DRM'
        check Enable DRM play
        In the 'Find in Settings' search box, look up, 'webgl'
